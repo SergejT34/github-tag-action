@@ -37,6 +37,48 @@ describe('github-tag-action', () => {
   });
 
   describe('special cases', () => {
+
+    it('does create major tag, ignores commit analysis', async () => {
+      /*
+       * Given
+       */
+      setInput('ignore_commit_analyzer', 'true');
+      setInput('default_bump', 'major');
+      const commits = [{ message: 'feat: this is my first fix', hash: null }];
+      jest
+        .spyOn(utils, 'getCommits')
+        .mockImplementation(async (sha) => commits);
+
+      const validTags = [
+        {
+          name: 'v1.2.3',
+          commit: { sha: '012345', url: '' },
+          zipball_url: '',
+          tarball_url: 'string',
+          node_id: 'string',
+        },
+      ];
+      jest
+        .spyOn(utils, 'getValidTags')
+        .mockImplementation(async () => validTags);
+
+      /*
+       * When
+       */
+      await action();
+
+      /*
+       * Then
+       */
+      expect(mockCreateTag).toHaveBeenCalledWith(
+        'v2.0.0',
+        expect.any(Boolean),
+        expect.any(String)
+      );
+      expect(mockSetFailed).not.toBeCalled();
+    });
+
+
     it('does create initial tag', async () => {
       /*
        * Given

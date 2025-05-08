@@ -32,6 +32,7 @@ export default async function main() {
   const customReleaseRules = core.getInput('custom_release_rules');
   const shouldFetchAllTags = core.getInput('fetch_all_tags');
   const commitSha = core.getInput('commit_sha');
+  const ignoreCommitAnalyzer = core.getBooleanInput('ignore_commit_analyzer');
 
   let mappedReleaseRules;
   if (customReleaseRules) {
@@ -123,15 +124,18 @@ export default async function main() {
 
     commits = await getCommits(previousTag.commit.sha, commitRef);
 
-    let bump = await analyzeCommits(
-      {
-        releaseRules: mappedReleaseRules
-          ? // analyzeCommits doesn't appreciate rules with a section /shrug
-            mappedReleaseRules.map(({ section, ...rest }) => ({ ...rest }))
-          : undefined,
-      },
-      { commits, logger: { log: console.info.bind(console) } }
-    );
+    let bump: any;
+    if (!ignoreCommitAnalyzer) {
+      bump = await analyzeCommits(
+        {
+          releaseRules: mappedReleaseRules
+            ? // analyzeCommits doesn't appreciate rules with a section /shrug
+              mappedReleaseRules.map(({ section, ...rest }) => ({ ...rest }))
+            : undefined,
+        },
+        { commits, logger: { log: console.info.bind(console) } }
+      );
+    }
 
     // Determine if we should continue with tag creation based on main vs prerelease branch
     let shouldContinue = true;
