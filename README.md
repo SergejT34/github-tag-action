@@ -50,6 +50,7 @@ jobs:
 - **create_annotated_tag** _(optional)_ - Boolean to create an annotated rather than a lightweight one (default: `false`).
 - **tag_prefix** _(optional)_ - A prefix to the tag name (default: `v`).
 - **append_to_pre_release_tag** _(optional)_ - A suffix to the pre-release tag name (default: `<branch>`).
+- **ignore_commit_analyzer** _(optional)_ - When set to true, skips bump based on commit message analysis. (default: `false`).
 
 #### Customize the conventional commit messages & titles of changelog sections
 
